@@ -69,6 +69,8 @@ contract FlashLoan {
         address[] memory path3 = new address[](2);
         path3[0] = WETH;
         path3[1] = USDT;
+
+        //由于手续费, 使得amounts2[1]不够还贷, 所以要使用amounts3[0]还贷
         uint[] memory amounts3 = uniRouter(router).getAmountsIn(loanAmount,path3);
         emit Balance(amounts3[0]);
         
@@ -79,6 +81,7 @@ contract FlashLoan {
     
     function swap(uint256 _loanAmount) public {
         loanAmount = _loanAmount;
+        //闪电贷才需要直接调用pair.swap()这么底层的函数, 正常兑换的话只需要调用路由合约中的6个兑换函数即可
         pair(USDTETH).swap(uint(0),_loanAmount,address(this),_data);
     }
     function safeApprove(address token, address to, uint value) internal {
